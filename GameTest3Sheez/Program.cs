@@ -31,11 +31,12 @@ namespace GameTest3Sheez
             
         }
     }
-    //----> TODO: Create hierarchy.
+
+    //----> TODO: Create hierarchy (folders).
     //----> TODO: Dictionary + IStorable interface for adding swords to an inventory.
     //----> TODO: Allow for charachter saving and loading using serialization to XML.
     //----> TODO: Implement IDisposable.
-    //----> TODO:
+    //----> TODO: Set up database to store items (and connection).
 
 
     /// <summary>
@@ -47,7 +48,7 @@ namespace GameTest3Sheez
     /// </summary>
     abstract class Player //: IDisposable <-- stuck on this
     {
-            //Properties    //Properties need to be NOT abstract
+            //Properties    
         public string playerName { get; set; }
         public double level { get; set; }
         public double maxHealth { get; set; }
