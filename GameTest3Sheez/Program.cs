@@ -132,7 +132,7 @@ namespace GameTest3Sheez
 
     #region Abstract class : Items
 
-    public abstract class Items //Needs interfaces: IEquippable, IWeapon, IPartOfQuest, IDamagable
+    public abstract class Items //Needs interfaces: IEquippable, IWeapon, IPartOfQuest, IDamagable, IExclusiveToClass
     {
         public double goldValue { get; set; }
         public double weight { get; set; }
