@@ -32,9 +32,9 @@ namespace GameTest3Sheez
         }
     }
     //----> TODO: Create hierarchy.
-    //----> TODO: Dictionary + IStorable interface for adding swords to an inventory
-    //----> TODO:
-    //----> TODO:
+    //----> TODO: Dictionary + IStorable interface for adding swords to an inventory.
+    //----> TODO: Allow for charachter saving and loading using serialization to XML.
+    //----> TODO: Implement IDisposable.
     //----> TODO:
 
 
