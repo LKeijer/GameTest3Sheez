@@ -22,15 +22,9 @@ namespace GameTest3Sheez
             Console.WriteLine("________________________________________________________________________________________________________________________");
             Console.WriteLine(stats);
             Console.WriteLine("________________________________________________________________________________________________________________________");
-            Sword sword = new Sword();
-            Console.WriteLine(sword.itemName + " With the stats: " + sword.damage + " DMG, " + sword.durability + " Dura " + sword.goldValue + " Gold" + " Weighs " + sword.weight);
-            object swordObject = sword as object;
-            sword.AddToInventory(swordObject);
 
-            Sword swordy = new Sword("woffleslayer");
-            Console.WriteLine(swordy.itemName + " With the stats: " + swordy.damage + " DMG, " + swordy.durability + " Dura " + swordy.goldValue + " Gold" + " Weighs " + swordy.weight);
-            object swordObjecty = sword as object;
-            sword.AddToInventory(swordObjecty);
+            Sword sword = new Sword("woffleslayer");
+            Console.WriteLine(sword.itemName + " With the stats: " + sword.damage + " DMG, " + sword.durability + " Dura " + sword.goldValue + " Gold" + " Weighs " + sword.weight);
 
             //Combat test
             for (int i = 0; i<11;i++) // fights the instanced enemy 11 times.
@@ -46,6 +40,7 @@ namespace GameTest3Sheez
                     Console.WriteLine("________________________________________________________________________________________________________________________");
                 }
             }
+
             Console.ReadKey();
 
 
@@ -72,12 +67,32 @@ namespace GameTest3Sheez
     {
             //Properties    
         public string playerName { get; set; }
-        public double level { get; set; }
+        
         public double maxHealth { get; set; }
         public double currentHealth { get; set; }
         public int strenght { get; set; }
         public int constitution { get; set; }
         public int intelligence { get; set; }
+        public double xpTarget { get; set; }
+        public double currentXP { get; set; }
+        public double level
+        {
+            get
+            {
+                return level;
+            }
+            set
+            {
+                if (level == 1)
+                {
+                    xpTarget = 100;
+                }
+                else
+                {
+                    xpTarget = level * xpTarget;
+                }
+            }
+        }
 
             //Abstract Methods
         abstract public void SetName(string _name);
@@ -105,6 +120,12 @@ namespace GameTest3Sheez
         private double baseLevel = 1;
         private int baseIntelligence = 2;
 
+        public void AddXP()
+        {
+
+        }
+
+
             //Default constructor
         public Warrior()
         {
@@ -114,7 +135,9 @@ namespace GameTest3Sheez
         public Warrior(string name)
         {
             SetName(name);
+
             level = baseLevel;
+
             SetHealth(baseHealth);
             currentHealth = maxHealth;
             SetStrenght(baseStrenght);
@@ -156,7 +179,7 @@ namespace GameTest3Sheez
             intelligence = _intelligence;
         }
 
-        public override bool SaveCharacter()
+        public override bool SaveCharacter() // not implemented
         {
             return true;
         }
