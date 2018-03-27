@@ -75,24 +75,7 @@ namespace GameTest3Sheez
         public int intelligence { get; set; }
         public double xpTarget { get; set; }
         public double currentXP { get; set; }
-        public double level
-        {
-            get
-            {
-                return level;
-            }
-            set
-            {
-                if (level == 1)
-                {
-                    xpTarget = 100;
-                }
-                else
-                {
-                    xpTarget = level * xpTarget;
-                }
-            }
-        }
+        public double level { get; set; }
 
             //Abstract Methods
         abstract public void SetName(string _name);
