@@ -22,21 +22,43 @@ namespace GameTest3Sheez
             Console.WriteLine("________________________________________________________________________________________________________________________");
             Console.WriteLine(stats);
             Console.WriteLine("________________________________________________________________________________________________________________________");
-            
+            Sword sword = new Sword();
+            Console.WriteLine(sword.itemName + " With the stats: " + sword.damage + " DMG, " + sword.durability + " Dura " + sword.goldValue + " Gold" + " Weighs " + sword.weight);
+            object swordObject = sword as object;
+            sword.AddToInventory(swordObject);
 
-            //Dispose check
-            Console.WriteLine(myWarrior.currentHealth);
+            Sword swordy = new Sword("woffleslayer");
+            Console.WriteLine(swordy.itemName + " With the stats: " + swordy.damage + " DMG, " + swordy.durability + " Dura " + swordy.goldValue + " Gold" + " Weighs " + swordy.weight);
+            object swordObjecty = sword as object;
+            sword.AddToInventory(swordObjecty);
 
+            //Combat test
+            for (int i = 0; i<11;i++) // fights the instanced enemy 11 times.
+            {
+                Console.WriteLine("________________________________________________________________________________________________________________________");
+                Enemy rat = new Enemy("rat");
+                if(rat.ResolveCombat(myWarrior, sword))
+                {
+                    myWarrior.GetExperience(rat);
+                    sword.DamageWeapon(rat.enemyDuraDamage);
+                    Console.WriteLine("________________________________________________________________________________________________________________________");
+                    Console.WriteLine(myWarrior.currentHealth + " Health left. " + sword.durability + " durability left on your " + sword.itemName + ". Current xp: " + myWarrior.level);
+                    Console.WriteLine("________________________________________________________________________________________________________________________");
+                }
+            }
             Console.ReadKey();
-            
+
+
         }
     }
 
+    //----> TODO: Create enemy class.
     //----> TODO: Create hierarchy (folders).
     //----> TODO: Dictionary + IStorable interface for adding swords to an inventory.
     //----> TODO: Allow for charachter saving and loading using serialization to XML.
     //----> TODO: Implement IDisposable.
     //----> TODO: Set up database to store items (and connection).
+    //----> TODO: Set up leveling method.
 
 
     /// <summary>
@@ -46,7 +68,7 @@ namespace GameTest3Sheez
     /// <summary>
     /// This class serves as the blueprint for every playable class.
     /// </summary>
-    abstract class Player //: IDisposable <-- stuck on this
+    public abstract class Player //: IDisposable <-- stuck on this
     {
             //Properties    
         public string playerName { get; set; }
@@ -59,10 +81,14 @@ namespace GameTest3Sheez
 
             //Abstract Methods
         abstract public void SetName(string _name);
-        abstract public void SetLevel(double _level);
+        abstract public void GetExperience(Enemy _enemy);
         abstract public void SetHealth(double _health);
         abstract public void SetStrenght(int _strenght);
         abstract public void SetConstitution(int _constitution);
+        abstract public void SetIntelligence(int _intelligence);
+        abstract public bool SaveCharacter();
+
+        //abstract public void LevelUp();
     }
     #endregion
 
@@ -70,13 +96,14 @@ namespace GameTest3Sheez
     /// <summary>
     /// Playable class Warrior that derrives from Player class.
     /// </summary>
-    class Warrior : Player
+    public class Warrior : Player
     {
             //Private properties available to Warrior class only.
         private int baseStrenght = 10;
         private double baseHealth = 100;
         private int baseConstitution = 10;
         private double baseLevel = 1;
+        private int baseIntelligence = 2;
 
             //Default constructor
         public Warrior()
@@ -87,12 +114,14 @@ namespace GameTest3Sheez
         public Warrior(string name)
         {
             SetName(name);
-            SetLevel(baseLevel);
+            level = baseLevel;
             SetHealth(baseHealth);
             currentHealth = maxHealth;
             SetStrenght(baseStrenght);
             SetConstitution(baseConstitution);
+            SetIntelligence(baseIntelligence);
         }
+
 
         //Mandatory overrides declared in baseclass.
         public override void SetName(string _name)
@@ -106,10 +135,9 @@ namespace GameTest3Sheez
                 throw new ArgumentException("Playername was already set once.");
             }
         }
-        public override void SetLevel(double _level)
+        public override void GetExperience(Enemy _enemy)
         {
-            
-            level = _level;
+            level += _enemy.experience;
         }
         public override void SetHealth(double _health)
         {
@@ -123,6 +151,15 @@ namespace GameTest3Sheez
         {
             constitution = _constitution;
         }
+        public override void SetIntelligence(int _intelligence)
+        {
+            intelligence = _intelligence;
+        }
+
+        public override bool SaveCharacter()
+        {
+            return true;
+        }
     }
     #endregion
 
@@ -134,6 +171,7 @@ namespace GameTest3Sheez
 
     public abstract class Items //Needs interfaces: IEquippable, IWeapon, IPartOfQuest, IDamagable, IExclusiveToClass
     {
+        public string itemName { get; set; }
         public double goldValue { get; set; }
         public double weight { get; set; }
 
@@ -147,20 +185,33 @@ namespace GameTest3Sheez
     #region Abstract class Weapons : Items
     public abstract class Weapons : Items
     {
-        public int damage { get; private set; }
-        public double durability { get; private set; }
+        public int damage { get; internal set; }
+        public double durability { get; internal set; }
 
     }
     #endregion
 
     #region Class Sword : Weapons
-    public class Sword : Weapons , IStorable
+    public class Sword : Weapons , IStorable, IDamagable
     {
         public Dictionary<string, object> dictionairy = new Dictionary<string, object>();//Want this in the interface declaration
 
         public Sword()
         {
-            
+            itemName = "Sword";
+            damage = 10;
+            durability = 20;
+            goldValue = 100;
+            weight = 2;
+        }
+
+        public Sword(string _name)
+        {
+            itemName = _name;
+            damage = 10;
+            durability = 20;
+            goldValue = 100;
+            weight = 2;
         }
 
         public override void BuyItem()
@@ -176,22 +227,99 @@ namespace GameTest3Sheez
         {
             throw new NotImplementedException();
         }
-        public void Add2Dictionary(Sword _sword) // <<<==== working on this
+        public void AddToInventory(object itemToAdd) //Do this with event handler??
         {
-            dictionairy.Add("sword1", _sword);
+            Sword addThis = itemToAdd as Sword;
+            for (int i = 0; i < dictionairy.Count; i++)
+            {
+                try
+                {
+                    dictionairy.Add("1", addThis);
+                }
+                catch
+                {
+                    return;
+                }
+            }
+            Console.WriteLine(dictionairy.Count);
         }
+
+        public void DamageWeapon(double _damage)
+        {
+            this.durability -= _damage;
+        }
+    }
+
+    public class Inventory
+    {
+        public int inventorySize;
+        
     }
 
     #endregion
 
     /// <summary>
-    /// Below all interfaces
+    /// Below Enemy class.
+    /// </summary>
+
+    #region class Enemy
+    public class Enemy
+    {
+        public string enemyName;
+        public int enemyDamage;
+        public double enemyDuraDamage;
+        public int experience;
+        public double enemyHealth;
+        public string enemyDropTable;
+
+        public Enemy(string _rat)
+        {
+            enemyName = "Rat";
+            enemyDamage = 5;
+            enemyDuraDamage = 1;
+            enemyHealth = 20;
+            experience = 10;
+        }
+        public bool ResolveCombat(Warrior _player,Sword  _weapon)
+        {
+            if (_player.currentHealth > 0)
+            {
+                do
+                {
+                    _player.currentHealth -= enemyDamage;
+                    enemyHealth -= _weapon.damage;
+                }
+                while (_player.currentHealth > 0 && enemyHealth > 0);
+                if (_player.currentHealth > 0 && enemyHealth <= 0)
+                {
+
+                    Console.WriteLine("You won the fight against a " + enemyName);
+                    return true;
+                }
+                else
+                {
+                    Console.WriteLine("You lost the fight against a " + enemyName);
+                    return false;
+                }
+            }
+            else
+            {
+                Console.WriteLine("You are dead!");
+                return false;
+            }
+        
+        }
+    }
+    #endregion
+
+    /// <summary>
+    /// Below all interfaces want IEnemy?
     /// </summary>
 
     #region Interface IStorable
     public interface IStorable
     {
-        void Add2Dictionary(Sword _sword);
+        void AddToInventory(object itemToAdd);
     }
 
     #endregion
@@ -199,7 +327,7 @@ namespace GameTest3Sheez
     #region Interface IDamagable
     public interface IDamagable
     {
-        void SellItem();
+        void DamageWeapon(double _damage);
     }
     #endregion
 }
